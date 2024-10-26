@@ -1,0 +1,298 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": "${command:pickArgs}"
+        },
+        {
+            "name": "[finetune] [franka] [quadruple250] [bimanual]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [quadruple250] [bimanual]", "--task_name", "franka_dual_bimanual_sim_quadruple_dataset", "--batch_size", "64", "--num_steps", "800", "--num_epochs", "10", "--num_episodes", "1000",
+            "--data_dir", "franka_dual_bimanual_sim_quadruple_dataset", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple"]
+        },
+        {
+            "name": "[finetune] [franka] [quadruple250] [bimanual] [lang]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [quadruple250] [bimanual] [lang]", "--task_name", "franka_dual_bimanual_sim_quadruple_dataset", "--batch_size", "64", "--num_steps", "800", "--num_epochs", "10", "--num_episodes", "1000",
+            "--data_dir", "franka_dual_bimanual_sim_quadruple_dataset_lang", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_lang"]
+        },
+        {
+            "name": "[finetune] [mobile] [cucumber300] [diffusion]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [mobile] [cucumber300] [diffusion]", "--task_name", "mobile_aloha_sim_cucumber_dataset", "--batch_size", "64", "--num_steps", "720", "--num_epochs", "500", "--num_episodes", "300", "--epoch_per_run", "5",
+            "--action_horizon", "4",
+            "--data_dir", "mobile_aloha_sim_cucumber_dataset_300", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion"]
+        },
+        {
+            "name": "[finetune] [mobile] [cucumber300] [diffusion] [horizon4] [second]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/02_finetune_new_observation_action.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [mobile] [cucumber300] [diffusion] [horizon4] [second]", "--task_name", "mobile_aloha_sim_cucumber_dataset", "--batch_size", "64", "--num_steps", "720", "--num_epochs", "5", "--num_episodes", "300", 
+            "--action_horizon", "4",
+            "--data_dir", "mobile_aloha_sim_cucumber_dataset_300", "--pretrained_path", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion_first", "--save_dir", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion_horizon4_second"]
+        },
+        {
+            "name": "[finetune] [mobile] [cucumber300] [diffusion] [third]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/02_finetune_new_observation_action.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [mobile] [cucumber300] [diffusion] [third]", "--task_name", "mobile_aloha_sim_cucumber_dataset", "--batch_size", "64", "--num_steps", "720", "--num_epochs", "5", "--num_episodes", "300", 
+            "--action_horizon", "16",
+            "--data_dir", "mobile_aloha_sim_cucumber_dataset_300", "--pretrained_path", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion_second", "--save_dir", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion_third"]
+        },
+        {
+            "name": "[finetune] [franka] [cushion]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [cushion1000]", "--task_name", "franka_dual_sim_cushion_dataset", "--batch_size", "64", "--num_steps", "600", "--num_epochs", "10", "--num_episodes", "1000",
+            "--data_dir", "franka_dual_sim_cushion_dataset", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_sim_cushion"]
+        },
+        {
+            "name": "[finetune] [franka] [cushion] [augment]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [cushion1000] [augment]", "--task_name", "franka_dual_sim_cushion_dataset", "--batch_size", "64", "--num_steps", "600", "--num_epochs", "10", "--num_episodes", "1000",
+            "--augment", "--data_dir", "franka_dual_sim_cushion_dataset", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_sim_cushion_augment"]
+        },
+        {
+            "name": "[finetune] [franka] [cushion] [hue-augment]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [cushion1000] [hue-augment]", "--task_name", "franka_dual_sim_cushion_dataset", "--batch_size", "64", "--num_steps", "600", "--num_epochs", "10", "--num_episodes", "1000",
+            "--augment", "--data_dir", "franka_dual_sim_cushion_dataset", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_sim_cushion_hue_augment"]
+        },
+        {
+            "name": "[finetune] [franka] [cushion] [recovery30]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [cushion1000] [recovery30]", "--task_name", "franka_dual_sim_cushion_dataset", "--batch_size", "64", "--num_steps", "600", "--num_epochs", "10", "--num_episodes", "1000",
+            "--data_dir", "franka_dual_sim_cushion_dataset_recovery_30", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_30"]
+        },
+        {
+            "name": "[finetune] [franka] [cushion] [recovery50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/sequential_finetune.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[finetune] [franka] [cushion1000] [recovery50]", "--task_name", "franka_dual_sim_cushion_dataset", "--batch_size", "64", "--num_steps", "600", "--num_epochs", "10", "--num_episodes", "1000",
+            "--data_dir", "franka_dual_sim_cushion_dataset_recovery_50", "--pretrained_path", "hf://rail-berkeley/octo-small-1.5", "--save_dir", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_50"]
+        },
+        {
+            "name": "[evaluate] [real] [mobile] [cucumber597] [diffusion] [cucumber50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [real] [mobile] [cucumber597] [diffusion] [cucumber50]", "--env_name", "mobile-aloha-sim-cucumber-v0", "--finetuned_path", "/workspaces/octo/.finetune_aloha_mobile_put_kyuri_open_in_bucket_data21_small_10000shuffle_lr3_100epoch_diffusion_head", "--num_rollouts", "50",
+                    "--output_dir", "real_diffusion_cucumber597_cucumber_50"]
+        },
+        {
+            "name": "[evaluate] [mobile] [cucumber300] [horizon4]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [mobile] [cucumber300] [horizon4]", "--env_name", "mobile-aloha-sim-cucumber-v0", "--finetuned_path", "/workspaces/octo/.finetune_mobile_aloha_sim_cucumber_300_diffusion_horizon4_second", "--num_rollouts", "50",
+                    "--action_horizon", "4", "--output_dir", "mobile_cucumber_300_cucumber_50_horizon4"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [left-cucumber50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [left-cucumber50]", "--env_name", "franka-dual-bimanual-sim-left-cucumber-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_left_cucumber_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [left-cube50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [left-cube50]", "--env_name", "franka-dual-bimanual-sim-left-cube-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_left_cube_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [lang] [left-cucumber-first-50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [lang] [left-cucumber-first-50]", "--env_name", "franka-dual-bimanual-sim-left-cucumber-first-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_lang_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_lang_left_cucumber_first_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [lang] [right-cube-first-50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [lang] [right-cube-first-50]", "--env_name", "franka-dual-bimanual-sim-right-cube-first-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_lang_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_lang_right_cube_first_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [lang] [left-cube-first-50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [lang] [left-cube-first-50]", "--env_name", "franka-dual-bimanual-sim-left-cube-first-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_lang_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_lang_left_cube_first_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [quadruple250] [bimanual] [lang] [right-cucumber-first-50]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [quadruple250] [bimanual] [lang] [right-cucumber-first-50]", "--env_name", "franka-dual-bimanual-sim-right-cucumber-first-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_bimanual_sim_quadruple_lang_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_quadruple_250_bimanual_lang_right_cucumber_first_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [cushion-v]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [cushion-v]", "--env_name", "franka-dual-sim-cushion-v-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_cushion_v_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [cushion-h]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [cushion-h]", "--env_name", "franka-dual-sim-cushion-h-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_cushion_h_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [cushion-v-eval]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [cushion-v-eval]", "--env_name", "franka-dual-sim-cushion-v-eval-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_cushion_v_eval_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [cushion-h-eval]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [cushion-h-eval]", "--env_name", "franka-dual-sim-cushion-h-eval-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_cushion_h_eval_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [second] [cushion-v-eval]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [second] [cushion-v-eval]", "--env_name", "franka-dual-sim-cushion-v-eval-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_second", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_second_cushion_v_eval_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [augment] [cushion-v]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [augment] [cushion-v]", "--env_name", "franka-dual-sim-cushion-v-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_augment_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_augment_cushion_v_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [augment] [cushion-h]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [augment] [cushion-h]", "--env_name", "franka-dual-sim-cushion-h-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_augment_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_augment_cushion_h_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [augment] [cushion-v-eval]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [augment] [cushion-v-eval]", "--env_name", "franka-dual-sim-cushion-v-eval-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_augment_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_augment_cushion_v_eval_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [hue-augment] [cushion-v-eval]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [hue-augment] [cushion-v-eval]", "--env_name", "franka-dual-sim-cushion-v-eval-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_hue_augment_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_hue_augment_second_cushion_v_eval_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [recovery30] [recovery]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [recovery30] [recovery]", "--env_name", "franka-dual-sim-cushion-v-recovery-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_30_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_recovery_30_cushion_v_recovery_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [recovery30] [cushion-v]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [recovery30] [cushion-v]", "--env_name", "franka-dual-sim-cushion-v-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_30_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_recovery_30_cushion_v_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [recovery50] [recovery]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [recovery50] [recovery]", "--env_name", "franka-dual-sim-cushion-v-recovery-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_50_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_recovery_50_cushion_v_recovery_50"]
+        },
+        {
+            "name": "[evaluate] [franka] [cushion1000] [recovery50] [cushion-v]",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/03_eval_finetuned.py",
+            "console": "integratedTerminal",
+            "args": ["--exp_name", "[eval] [franka] [cushion1000] [recovery50] [cushion-v]", "--env_name", "franka-dual-sim-cushion-v-v0", "--finetuned_path", "/workspaces/octo/.finetune_franka_dual_sim_cushion_recovery_50_tenth", "--num_rollouts", "50",
+                    "--output_dir", "franka_cushion_1000_recovery_50_cushion_v_50"]
+        }
+    ]
+}
