@@ -166,3 +166,5 @@ Octo was pretrained with an action chunking size of 4, meaning it predicts the n
     year = {2024},
 }
 ```
+
+xhost +local:docker

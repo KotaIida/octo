@@ -13,13 +13,14 @@ import optax
 import tensorflow as tf
 import tqdm
 import wandb
-
 from octo.data.dataset import make_single_dataset
-from octo.model.components.action_heads import L1ActionHead
+from octo.model.components.action_heads import L1ActionHead, DiffusionActionHead
 from octo.model.components.tokenizers import LowdimObsTokenizer
 from octo.model.octo_model import OctoModel
 from octo.utils.jax_utils import initialize_compilation_cache
 from octo.utils.spec import ModuleSpec
+from octo.model.components.vit_encoders import SmallStem16
+from octo.model.components.tokenizers import ImageTokenizer
 from octo.utils.train_utils import (
     freeze_weights,
     merge_params,
@@ -32,14 +33,57 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string(
     "pretrained_path", None, "Path to pre-trained Octo checkpoint directory."
 )
+flags.DEFINE_string("task_name", None, "Task name for finetuning.")
+flags.DEFINE_string("exp_name", None, "Experiment name for finetuning.")
 flags.DEFINE_string("data_dir", None, "Path to finetuning dataset, in RLDS format.")
 flags.DEFINE_string("save_dir", None, "Directory for saving finetuning checkpoints.")
 flags.DEFINE_integer("batch_size", 128, "Batch size for finetuning.")
+flags.DEFINE_integer("action_horizon", 50, "Length of action horizon.")
+flags.DEFINE_integer("num_epochs", 10, "Number of epochs")
+flags.DEFINE_integer("num_episodes", 1000, "Number of episodes")
+flags.DEFINE_integer("num_steps", 600, "Number of steps per an episode.")
 
 flags.DEFINE_bool(
     "freeze_transformer",
     False,
     "Whether pre-trained transformer weights should be frozen.",
+)
+
+flags.DEFINE_bool(
+    "augment",
+    False,
+    "Whether to use image augmentations",
+)
+
+flags.DEFINE_string("task", "language_conditioned", "image_conditioned or language_conditioned or multimodal")
+flags.DEFINE_string("strategy", "uniform", "None or uniform or last for goal relabeling strategy")
+
+
+workspace_augment_kwargs = dict(
+    random_resized_crop=dict(scale=[0.8, 1.0], ratio=[0.9, 1.1]),
+    random_brightness=[0.1],
+    random_contrast=[0.9, 1.1],
+    random_saturation=[0.9, 1.1],
+    random_hue=[0.5],
+    augment_order=[
+        "random_resized_crop",
+        "random_brightness",
+        "random_contrast",
+        "random_saturation",
+        "random_hue",
+    ],
+)
+wrist_augment_kwargs = dict(
+    random_brightness=[0.1],
+    random_contrast=[0.9, 1.1],
+    random_saturation=[0.9, 1.1],
+    random_hue=[0.5],
+    augment_order=[
+        "random_brightness",
+        "random_contrast",
+        "random_saturation",
+        "random_hue",
+    ],
 )
 
 
@@ -53,7 +97,7 @@ def main(_):
     tf.config.set_visible_devices([], "GPU")
 
     # setup wandb for logging
-    wandb.init(name="finetune_aloha", project="octo")
+    wandb.init(name=FLAGS.exp_name, project="Octo_Franka_Sim_Cushion")
 
     # load pre-trained model
     logging.info("Loading pre-trained model...")
@@ -64,20 +108,62 @@ def main(_):
     # delete goal images in the data loader since we will train a language-conditioned-only policy
     # TODO: directly load this from raw data to make it less opaque?
     logging.info("Loading finetuning dataset...")
+    if "aloha_sim_cube" in FLAGS.task_name:
+        image_obs_keys={"primary": "top"}
+        resize_size={"primary": (256, 256)}
+        action_dim = 14
+    elif "mobile" in FLAGS.task_name:
+        image_obs_keys={"primary": "angle", "left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
+        resize_size={"primary": (256, 256), "left_wrist": (256, 256), "right_wrist": (256, 256)}
+        action_dim = 14
+        # image_obs_keys={"primary": "angle", "secondary": "top", "left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
+        # resize_size={"primary": (256, 256), "secondary": (256, 256), "left_wrist": (256, 256), "right_wrist": (256, 256)}
+    elif "franka" in FLAGS.task_name:
+        # image_obs_keys={"left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
+        # resize_size={"left_wrist": (256, 256), "right_wrist": (256, 256)}
+        image_obs_keys={"primary": "angle", "left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
+        resize_size={"primary": (256, 256), "left_wrist": (256, 256), "right_wrist": (256, 256)}
+        if FLAGS.augment:
+            image_augment_kwargs = {"primary": workspace_augment_kwargs, "left_wrist": wrist_augment_kwargs, "right_wrist": wrist_augment_kwargs}
+        else:
+            image_augment_kwargs = {}
+        action_dim = 16
+    else:
+        image_obs_keys={"primary": "top", "secondary": "angle", "left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
+        resize_size={"primary": (256, 256), "secondary": (256, 256), "left_wrist": (256, 256), "right_wrist": (256, 256)}
+        action_dim = 14
+
+    if FLAGS.task == "image_conditioned":
+        language_key = None
+        goal_relabeling_strategy = FLAGS.strategy
+        keep_image_prob = 1.0
+    elif FLAGS.task == "language_conditioned":
+        language_key = "language_instruction"
+        goal_relabeling_strategy = None
+        keep_image_prob = 0.0
+    elif FLAGS.task == "multimodal":
+        language_key = "language_instruction"
+        goal_relabeling_strategy = FLAGS.strategy
+        keep_image_prob = 0.5
+    else:
+        raise ValueError("Invalid modality")
+
     dataset = make_single_dataset(
         dataset_kwargs=dict(
-            name="aloha_sim_cube_scripted_dataset",
+            name=FLAGS.task_name,
             data_dir=FLAGS.data_dir,
-            image_obs_keys={"primary": "top"},
+            image_obs_keys=image_obs_keys,
             proprio_obs_key="state",
-            language_key="language_instruction",
+            language_key=language_key,
         ),
         traj_transform_kwargs=dict(
             window_size=1,
-            action_horizon=50,
+            action_horizon=FLAGS.action_horizon,
+            goal_relabeling_strategy=goal_relabeling_strategy
         ),
         frame_transform_kwargs=dict(
-            resize_size={"primary": (256, 256)},
+            resize_size=resize_size,
+            image_augment_kwargs=image_augment_kwargs
         ),
         train=True,
     )
@@ -90,10 +176,14 @@ def main(_):
     )
 
     # run text tokenizer over batch (this needs to happen before training / sharding) + delete unused keys
-    text_processor = pretrained_model.text_processor
+    if FLAGS.task == "image_conditioned":
+        text_processor = None
+    else:
+        text_processor = pretrained_model.text_processor
 
     def process_batch(batch):
-        batch = process_text(batch, text_processor)
+        if FLAGS.task != "image_conditioned":
+            batch = process_text(batch, text_processor)
         del batch["dataset_name"]
         return batch
 
@@ -103,7 +193,8 @@ def main(_):
     # load pre-training config and modify --> remove wrist cam, add proprio input, change action head
     # following Zhao et al. we use "action chunks" of length 50 and L1 loss for ALOHA
     config = pretrained_model.config
-    del config["model"]["observation_tokenizers"]["wrist"]
+    if "wrist" in config["model"]["observation_tokenizers"].keys():
+        del config["model"]["observation_tokenizers"]["wrist"]
     ###
     config["model"]["observation_tokenizers"]["proprio"] = ModuleSpec.create(
         LowdimObsTokenizer,
@@ -113,14 +204,45 @@ def main(_):
         high=2.0,
         obs_keys=["proprio"],
     )
+    # config["model"]["observation_tokenizers"]["secondary"] = ModuleSpec.create(
+    #     ImageTokenizer,
+    #     obs_stack_keys=["image_secondary"],
+    #     task_stack_keys=[],
+    #     encoder=ModuleSpec.create(SmallStem16)
+    # )
+    # config["model"]["observation_tokenizers"]["left_wrist"] = ModuleSpec.create(
+    #     ImageTokenizer,
+    #     obs_stack_keys=["image_left_wrist"],
+    #     task_stack_keys=[],
+    #     encoder=ModuleSpec.create(SmallStem16)
+    # )
+    # config["model"]["observation_tokenizers"]["right_wrist"] = ModuleSpec.create(
+    #     ImageTokenizer,
+    #     obs_stack_keys=["image_right_wrist"],
+    #     task_stack_keys=[],
+    #     encoder=ModuleSpec.create(SmallStem16)
+    # )
+
     # Fully override the old action head with a new one (for smaller changes, you can use update_config)
     config["model"]["heads"]["action"] = ModuleSpec.create(
         L1ActionHead,
-        action_horizon=50,
-        action_dim=14,
+        action_horizon=FLAGS.action_horizon,
+        action_dim=action_dim,
         readout_key="readout_action",
     )
 
+    # config["model"]["heads"]["action"] = ModuleSpec.create(
+    #     DiffusionActionHead,
+    #     action_horizon=FLAGS.action_horizon,
+    #     action_dim=action_dim,
+    #     readout_key="readout_action",
+    # )
+    # config["model"]["heads"]["action"]["kwargs"]["action_dim"] = action_dim
+    # config["model"]["heads"]["action"]["kwargs"]["action_horizon"] = FLAGS.action_horizon
+    # config["model"]["heads"]["action"]["kwargs"]["diffusion_steps"] = 1
+    # config["model"]["heads"]["action"]["kwargs"]["loss_type"] = "l1"
+
+    config["dataset_kwargs"]["traj_transform_kwargs"]["task_augment_kwargs"]["keep_image_prob"] = keep_image_prob
     # initialize weights for modified Octo model, then merge in all applicable pre-trained weights
     # new position encodings for proprio inputs & weights for new action head will remain "from scratch"
     logging.info("Updating model for new observation & action space...")
@@ -182,7 +304,8 @@ def main(_):
 
     # run finetuning loop
     logging.info("Starting finetuning...")
-    for i in tqdm.tqdm(range(5000), total=5000, dynamic_ncols=True):
+    total_steps = FLAGS.num_epochs * FLAGS.num_episodes * FLAGS.num_steps // FLAGS.batch_size
+    for i in tqdm.tqdm(range(total_steps), total=total_steps, dynamic_ncols=True):
         batch = next(train_data_iter)
         train_state, update_info = train_step(train_state, batch)
         if (i + 1) % 100 == 0:

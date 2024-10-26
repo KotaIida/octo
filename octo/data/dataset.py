@@ -1,4 +1,5 @@
 from functools import partial
+import os
 import json
 from typing import Callable, Mapping, Optional, Sequence, Tuple, Union
 
@@ -39,7 +40,7 @@ def apply_trajectory_transforms(
     max_action_dim: Optional[int] = None,
     max_proprio_dim: Optional[int] = None,
     post_chunk_transforms: Sequence[ModuleSpec] = (),
-    num_parallel_calls: int = tf.data.AUTOTUNE,
+    num_parallel_calls: int = 1,
 ) -> dl.DLataset:
     """Applies common transforms that happen at a trajectory level. Such transforms are usually some sort of
     "relabeling" (e.g. filtering, chunking, adding goals, dropping keys). Transforms that happen in this
@@ -166,7 +167,7 @@ def apply_frame_transforms(
     depth_resize_size: Union[Tuple[int, int], Mapping[str, Tuple[int, int]]] = {},
     image_dropout_prob: float = 0.0,
     image_dropout_keep_key: Optional[str] = None,
-    num_parallel_calls: int = tf.data.AUTOTUNE,
+    num_parallel_calls: int = 1,
 ) -> dl.DLataset:
     """Applies common transforms that happen at a frame level. These transforms are usually more
     CPU-intensive, (e.g. decoding or resizing images).
@@ -254,8 +255,8 @@ def make_dataset_from_rlds(
     filter_functions: Sequence[ModuleSpec] = (),
     skip_norm: bool = False,
     ignore_errors: bool = False,
-    num_parallel_reads: int = tf.data.AUTOTUNE,
-    num_parallel_calls: int = tf.data.AUTOTUNE,
+    num_parallel_reads: int = 1,
+    num_parallel_calls: int = 1,
 ) -> Tuple[dl.DLataset, dict]:
     """This function is responsible for loading a specific RLDS dataset from storage and getting it into a
     standardized format. Yields a dataset of trajectories. Does not include CPU-intensive operations.
@@ -380,7 +381,7 @@ def make_dataset_from_rlds(
         return tf.shape(traj["action"])[0] > 0
 
     builder = tfds.builder(name, data_dir=data_dir)
-
+    # dataset_statistics = os.path.join(data_dir, name, "1.0.0", "dataset_statistics.json")
     # load or compute dataset statistics
     if isinstance(dataset_statistics, str):
         with tf.io.gfile.GFile(dataset_statistics, "r") as f:

@@ -11,7 +11,7 @@ flax == 0.7.5
 ml_collections >= 0.1.0
 tqdm >= 4.60.0
 absl-py >= 0.12.0
-scipy >= 1.6.0
+scipy == 1.12.0
 wandb >= 0.12.14
 einops >= 0.6.1
 imageio >= 2.31.1
@@ -25,3 +25,18 @@ tensorflow_graphics == 2021.12.3
 dlimp @ git+https://github.com/kvablack/dlimp@5edaa4691567873d495633f2708982b42edf1972
 plotly >= 5.16.1
 matplotlib
+opencv-python
+modern_robotics
+pyrealsense2
+h5py_cache
+pyquaternion
+pyyaml
+rospkg
+pexpect
+mujoco==2.3.3
+dm_control==1.0.9
+einops
+packaging
+h5py
+jupyter
+mediapy

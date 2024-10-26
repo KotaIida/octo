@@ -1,0 +1,36 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+	"name": "Existing Dockerfile",
+	"build": {
+		// Sets the run context to one level up instead of the .devcontainer folder.
+		"context": "..",
+		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+		"dockerfile": "../Dockerfile"
+	},
+    "customizations": {
+		"vscode": {
+			"extensions": ["ms-python.python", "ms-python.vscode-pylance"]
+		}
+	},
+    "runArgs": [
+		"--gpus=all", "--net", "host",
+		"--privileged",
+		"-e=DISPLAY", "-e=XDG_RUNTIME_DIR",
+		"-v", "/tmp/.X11-unix:/tmp/.X11-unix", "-v", "/media/sbr-tech/Desk SSD:/media/sbr-tech/ssd", "--shm-size=2gb", "-it"
+    ],
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created.
+	"postCreateCommand": "pip3 install -e . && pip3 install -r requirements.txt && pip3 install --upgrade jax[cuda11_pip]==0.4.20 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html"
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}

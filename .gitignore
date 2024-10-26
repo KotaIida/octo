@@ -166,3 +166,14 @@ wandb
 .vscode
 .idea
 datasets/debug_dataset/bridge_dataset/1.0.0/action_*
+wandb*
+aloha_*
+logdir
+.aloha_*
+.finetune_*
+act*
+mobile_*
+small_*
+franka_*
+*/result*
+pretrain_checkpoint
