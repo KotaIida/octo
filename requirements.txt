@@ -33,10 +33,11 @@ pyquaternion
 pyyaml
 rospkg
 pexpect
-mujoco==2.3.3
-dm_control==1.0.9
+mujoco==3.2.2
+dm-control==1.0.22
 einops
 packaging
 h5py
 jupyter
 mediapy
+inflect

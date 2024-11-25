@@ -33,8 +33,15 @@ flags.DEFINE_bool(
     "Whether to use image augmentations",
 )
 
+flags.DEFINE_bool(
+    "use_unet",
+    False,
+    "Whether to use UNetDDPMActionHead",
+)
+
 flags.DEFINE_string("task", "language_conditioned", "image_conditioned or language_conditioned or multimodal")
 flags.DEFINE_string("strategy", "uniform", "None or uniform or last for goal relabeling strategy")
+flags.DEFINE_string("proj_name", "Octo", "Experiment name for finetuning.")
 
 def main(_):
     total_run = FLAGS.num_epochs//FLAGS.epoch_per_run
@@ -54,12 +61,15 @@ def main(_):
         commands = ['python3', FLAGS.script, "--exp_name", exp_name, "--task_name", FLAGS.task_name, "--batch_size", str(FLAGS.batch_size), 
                     "--num_steps", str(FLAGS.num_steps), "--num_epochs", str(FLAGS.epoch_per_run), "--num_episodes", str(FLAGS.num_episodes),
                     "--data_dir", FLAGS.data_dir, "--pretrained_path", pretraind_path, "--save_dir", save_dir,
-                    "--action_horizon", str(FLAGS.action_horizon), "--task", FLAGS.task, "--strategy", FLAGS.strategy]
+                    "--action_horizon", str(FLAGS.action_horizon), "--task", FLAGS.task, "--strategy", FLAGS.strategy,
+                    "--proj_name", FLAGS.proj_name]
         
         if FLAGS.freeze_transformer:
             commands.append("--freeze_transformer")
         if FLAGS.augment:
             commands.append("--augment")
+        if FLAGS.use_unet:
+            commands.append("--use_unet")
 
         result = subprocess.run(commands, stdout=None, stderr=None)
         

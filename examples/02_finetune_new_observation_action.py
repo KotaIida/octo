@@ -14,7 +14,7 @@ import tensorflow as tf
 import tqdm
 import wandb
 from octo.data.dataset import make_single_dataset
-from octo.model.components.action_heads import L1ActionHead, DiffusionActionHead
+from octo.model.components.action_heads import L1ActionHead, DiffusionActionHead, UNetDDPMActionHead
 from octo.model.components.tokenizers import LowdimObsTokenizer
 from octo.model.octo_model import OctoModel
 from octo.utils.jax_utils import initialize_compilation_cache
@@ -55,8 +55,15 @@ flags.DEFINE_bool(
     "Whether to use image augmentations",
 )
 
+flags.DEFINE_bool(
+    "use_unet",
+    False,
+    "Whether to use UNetDDPMActionHead",
+)
+
 flags.DEFINE_string("task", "language_conditioned", "image_conditioned or language_conditioned or multimodal")
 flags.DEFINE_string("strategy", "uniform", "None or uniform or last for goal relabeling strategy")
+flags.DEFINE_string("proj_name", "Octo", "Experiment name for finetuning.")
 
 
 workspace_augment_kwargs = dict(
@@ -97,7 +104,7 @@ def main(_):
     tf.config.set_visible_devices([], "GPU")
 
     # setup wandb for logging
-    wandb.init(name=FLAGS.exp_name, project="Octo_Franka_Sim_Cushion")
+    wandb.init(name=FLAGS.exp_name, project=FLAGS.proj_name)
 
     # load pre-trained model
     logging.info("Loading pre-trained model...")
@@ -118,6 +125,10 @@ def main(_):
         action_dim = 14
         # image_obs_keys={"primary": "angle", "secondary": "top", "left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
         # resize_size={"primary": (256, 256), "secondary": (256, 256), "left_wrist": (256, 256), "right_wrist": (256, 256)}
+        if FLAGS.augment:
+            image_augment_kwargs = {"primary": workspace_augment_kwargs, "left_wrist": wrist_augment_kwargs, "right_wrist": wrist_augment_kwargs}
+        else:
+            image_augment_kwargs = {}
     elif "franka" in FLAGS.task_name:
         # image_obs_keys={"left_wrist": "left_wrist", "right_wrist": "right_wrist"}        
         # resize_size={"left_wrist": (256, 256), "right_wrist": (256, 256)}
@@ -224,12 +235,23 @@ def main(_):
     # )
 
     # Fully override the old action head with a new one (for smaller changes, you can use update_config)
-    config["model"]["heads"]["action"] = ModuleSpec.create(
-        L1ActionHead,
-        action_horizon=FLAGS.action_horizon,
-        action_dim=action_dim,
-        readout_key="readout_action",
-    )
+    if FLAGS.use_unet:
+        config["model"]["heads"]["action"] = ModuleSpec.create(
+            UNetDDPMActionHead,
+            action_horizon=FLAGS.action_horizon,
+            action_dim=action_dim,
+            readout_key="readout_action",
+            use_map=True,
+            flatten_tokens=False
+        )
+    else:
+        config["model"]["heads"]["action"] = ModuleSpec.create(
+            L1ActionHead,
+            action_horizon=FLAGS.action_horizon,
+            action_dim=action_dim,
+            readout_key="readout_action",
+        )
+    # config["dataset_kwargs"]["frame_transform_kwargs"]["num_parallel_calls"] = 1
 
     # config["model"]["heads"]["action"] = ModuleSpec.create(
     #     DiffusionActionHead,

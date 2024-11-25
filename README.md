@@ -168,3 +168,5 @@ Octo was pretrained with an action chunking size of 4, meaning it predicts the n
 ```
 
 xhost +local:docker
+
+sudo chown root:root 

@@ -617,7 +617,7 @@ class MobileAlohaCoupleCucumberGymEnv(gym.Env):
                         high=255 * np.ones((im_size, im_size, 3)),
                         dtype=np.uint8,
                     )
-                    for i in ["primary", "left_wrist", "right_wrist"][: len(camera_names)]
+                    for i in ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"][: len(camera_names)]
                 },
                 "proprio": gym.spaces.Box(
                     low=np.ones((14,)) * -1, high=np.ones((14,)), dtype=np.float32
@@ -639,7 +639,7 @@ class MobileAlohaCoupleCucumberGymEnv(gym.Env):
             vis_images = []
 
             black = np.zeros((self._im_size, self._im_size, 3), dtype=np.uint8)
-            obs_img_names = ["primary", "left_wrist", "right_wrist"]
+            obs_img_names = ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"]
             for i, cam_name in enumerate(self.camera_names):
                 curr_image = jnp.array(black.copy())
                 curr_obs[f"image_{obs_img_names[i]}"] = curr_image
@@ -651,7 +651,7 @@ class MobileAlohaCoupleCucumberGymEnv(gym.Env):
 
             images = np.concatenate(vis_images, axis=-2)
             info = {"images": images}
-            return {"image_primary":black, "image_left_wrist":black, "image_right_wrist":black, "proprio": np.nan}, 0, True, False, info
+            return {"image_primary":black, "image_secondary":black, "image_tertiary":black, "image_quaternary":black, "image_left_wrist":black, "image_right_wrist":black, "proprio": np.nan}, 0, True, False, info
         obs, images = self.get_obs(ts)
         reward = int(self._env.task.cucumber_in_bucket)
         info = {"images": images}
@@ -711,12 +711,12 @@ class MobileAlohaCoupleCucumberGymEnv(gym.Env):
 
     def get_obs(self, ts):
         curr_obs = {}
-        self.vis_images = []
+        self.vis_images = {}
 
-        obs_img_names = ["primary", "left_wrist", "right_wrist"]
+        obs_img_names = ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"]
         for i, cam_name in enumerate(self.camera_names):
             curr_image = ts.observation["images"][cam_name]
-            self.vis_images.append(copy.deepcopy(curr_image))
+            self.vis_images[f"image_{obs_img_names[i]}"] = copy.deepcopy(curr_image)
             curr_image = jnp.array(curr_image)
             curr_obs[f"image_{obs_img_names[i]}"] = curr_image
         curr_obs = dl.transforms.resize_images(
@@ -727,7 +727,7 @@ class MobileAlohaCoupleCucumberGymEnv(gym.Env):
         qpos = jnp.array(qpos_numpy)
         curr_obs["proprio"] = qpos
 
-        return curr_obs, np.concatenate(self.vis_images, axis=-2)
+        return curr_obs, self.vis_images
 
     def get_task(self):
         return {
@@ -870,7 +870,7 @@ class MobileAlohaCoupleCubeGymEnv(gym.Env):
                         high=255 * np.ones((im_size, im_size, 3)),
                         dtype=np.uint8,
                     )
-                    for i in ["primary", "left_wrist", "right_wrist"][: len(camera_names)]
+                    for i in ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"][: len(camera_names)]
                 },
                 "proprio": gym.spaces.Box(
                     low=np.ones((14,)) * -1, high=np.ones((14,)), dtype=np.float32
@@ -892,7 +892,7 @@ class MobileAlohaCoupleCubeGymEnv(gym.Env):
             vis_images = []
 
             black = np.zeros((self._im_size, self._im_size, 3), dtype=np.uint8)
-            obs_img_names = ["primary", "left_wrist", "right_wrist"]
+            obs_img_names = ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"]
             for i, cam_name in enumerate(self.camera_names):
                 curr_image = jnp.array(black.copy())
                 curr_obs[f"image_{obs_img_names[i]}"] = curr_image
@@ -904,7 +904,7 @@ class MobileAlohaCoupleCubeGymEnv(gym.Env):
 
             images = np.concatenate(vis_images, axis=-2)
             info = {"images": images}
-            return {"image_primary":black, "image_left_wrist":black, "image_right_wrist":black, "proprio": np.nan}, 0, True, False, info
+            return {"image_primary":black, "image_secondary":black, "image_tertiary":black, "image_quaternary":black, "image_left_wrist":black, "image_right_wrist":black, "proprio": np.nan}, 0, True, False, info
         obs, images = self.get_obs(ts)
         reward = int(self._env.task.cube_in_bucket)        
         info = {"images": images}
@@ -964,12 +964,12 @@ class MobileAlohaCoupleCubeGymEnv(gym.Env):
 
     def get_obs(self, ts):
         curr_obs = {}
-        self.vis_images = []
+        self.vis_images = {}
 
-        obs_img_names = ["primary", "left_wrist", "right_wrist"]
+        obs_img_names = ["primary", "secondary", "tertiary", "quaternary", "left_wrist", "right_wrist"]
         for i, cam_name in enumerate(self.camera_names):
             curr_image = ts.observation["images"][cam_name]
-            self.vis_images.append(copy.deepcopy(curr_image))
+            self.vis_images[f"image_{obs_img_names[i]}"] = copy.deepcopy(curr_image)
             curr_image = jnp.array(curr_image)
             curr_obs[f"image_{obs_img_names[i]}"] = curr_image
         curr_obs = dl.transforms.resize_images(
@@ -980,7 +980,7 @@ class MobileAlohaCoupleCubeGymEnv(gym.Env):
         qpos = jnp.array(qpos_numpy)
         curr_obs["proprio"] = qpos
 
-        return curr_obs, np.concatenate(self.vis_images, axis=-2)
+        return curr_obs, self.vis_images
 
     def get_task(self):
         return {

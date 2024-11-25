@@ -82,12 +82,17 @@ flags.DEFINE_integer(
     "Lengh of action horizon",
 )
 flags.DEFINE_string("exp_name", None, "Experiment name for finetuning.")
-
+flags.DEFINE_string("proj_name", "Octo", "Experiment name for finetuning.")
+flags.DEFINE_bool(
+    "use_unet",
+    False,
+    "Whether to use UNetDDPMActionHead",
+)
 
 
 def main(_):
     # setup wandb for logging
-    wandb.init(name=FLAGS.exp_name, project="Octo_Franka_Sim_Cushion")
+    wandb.init(name=FLAGS.exp_name, project=FLAGS.proj_name)
     np.random.seed(10)
 
     if FLAGS.env_name == "aloha-sim-cube-v0":
@@ -225,7 +230,10 @@ def main(_):
             # action_start = time.perf_counter()
             # del obs["image_primary"]
             actions = policy_fn(jax.tree_map(lambda x: x[None], obs), task)
-            actions = actions[0] # get only 1 batch which containes 50 actions
+            if FLAGS.use_unet:
+                actions = actions[0][0]
+            else:
+                actions = actions[0]
             # action_end = time.perf_counter()
 
             # step env -- info contains full "chunk" of observations for logging
